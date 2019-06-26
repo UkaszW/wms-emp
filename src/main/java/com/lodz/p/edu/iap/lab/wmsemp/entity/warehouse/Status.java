@@ -1,29 +1,23 @@
-package com.lodz.p.edu.iap.lab.wmsemp;
+package com.lodz.p.edu.iap.lab.wmsemp.entity.warehouse;
 
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
-@ToString
-@EqualsAndHashCode
-public class Item {
+public class Status {
 
     @Id
     @GeneratedValue
     private Long id;
-
     @NonNull
     private String code;
-
     @NonNull
     private String name;
-
-    @NonNull
-    private Long quantity;
 }
