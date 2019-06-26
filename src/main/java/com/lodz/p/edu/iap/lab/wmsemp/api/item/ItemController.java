@@ -1,39 +1,39 @@
-package com.lodz.p.edu.iap.lab.wmsemp;
+package com.lodz.p.edu.iap.lab.wmsemp.api.item;
 
+import com.lodz.p.edu.iap.lab.wmsemp.entity.warehouse.Item;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("api/v1/warehouse/item")
+@CrossOrigin(origins = "http://localhost:4210")
 public class ItemController {
+
     private ItemRepository repository;
 
     public ItemController(ItemRepository repository) {
         this.repository = repository;
     }
 
-    @GetMapping("/")
-    public String getInitial() {
-        return "Server works ;)";
-    }
-
-    @GetMapping("/items/get/all")
-    @CrossOrigin(origins = "http://localhost:4200")
+    @GetMapping("/all")
     public Collection<Item> getAll() {
         return repository.findAll();
     }
 
-    @GetMapping("/items/get/{id}")
-    @CrossOrigin(origins = "http://localhost:4200")
+    @GetMapping("/{id}")
     public Optional<Item> getById(@PathVariable(value = "id") Long id) {
         return repository.findById(id);
     }
 
-    @DeleteMapping("/items/delete/{id}")
-    @CrossOrigin(origins = "http://localhost:4200")
+    @PostMapping
+    public void save(@RequestBody Item item) {
+        repository.save(item);
+    }
+
+    @DeleteMapping("/{id}")
     public void deleteById(@PathVariable(value = "id") Long id) {
         repository.deleteById(id);
     }
-
 }
