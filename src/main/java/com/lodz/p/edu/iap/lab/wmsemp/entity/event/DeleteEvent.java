@@ -2,7 +2,6 @@ package com.lodz.p.edu.iap.lab.wmsemp.entity.event;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -13,6 +12,5 @@ import javax.persistence.Entity;
 @NoArgsConstructor
 public class DeleteEvent extends Event {
 
-    @NonNull
     private Long quantity;
 }

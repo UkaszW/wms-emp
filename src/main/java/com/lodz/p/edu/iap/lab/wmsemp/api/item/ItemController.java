@@ -1,7 +1,5 @@
 package com.lodz.p.edu.iap.lab.wmsemp.api.item;
 
-import com.lodz.p.edu.iap.lab.wmsemp.entity.event.AddEvent;
-import com.lodz.p.edu.iap.lab.wmsemp.entity.event.DeleteEvent;
 import com.lodz.p.edu.iap.lab.wmsemp.entity.warehouse.Item;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,7 +8,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1/warehouse/item")
-@CrossOrigin(origins = "http://localhost:4210")
+@CrossOrigin(origins = "http://localhost:4211")
 public class ItemController {
 
     private ItemRepository repository;
@@ -35,12 +33,12 @@ public class ItemController {
     }
 
     @PostMapping
-    public void save(@RequestBody AddEvent event) {
-        //ToDo
+    public void save(@RequestBody Item item) {
+        repository.save(item);
     }
 
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable(value = "id") Long id) {
-        DeleteEvent event = new DeleteEvent();
+        repository.deleteById(id);
     }
 }

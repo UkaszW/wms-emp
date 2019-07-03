@@ -1,9 +1,9 @@
 package com.lodz.p.edu.iap.lab.wmsemp.entity.warehouse;
 
 import com.lodz.p.edu.iap.lab.wmsemp.entity.BaseEntity;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -13,14 +13,20 @@ import java.util.Set;
 @NoArgsConstructor
 public class Warehouse extends BaseEntity {
 
-    @NonNull
     private String code;
-    @NonNull
     private String name;
-    @NonNull
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn
     private Address address;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "warehouse")
     private Set<Item> items;
+
+    @Builder
+    public Warehouse(Long id, String externalId, boolean addedOrUpdated, String code, String name, Address address, Set<Item> items) {
+        super(id, externalId, addedOrUpdated);
+        this.code = code;
+        this.name = name;
+        this.address = address;
+        this.items = items;
+    }
 }

@@ -1,60 +1,61 @@
 package com.lodz.p.edu.iap.lab.wmsemp.job;
 
 import com.lodz.p.edu.iap.lab.wmsemp.api.event.EventController;
+import com.lodz.p.edu.iap.lab.wmsemp.entity.BaseEntity;
 import com.lodz.p.edu.iap.lab.wmsemp.entity.event.Event;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
 public class DataSyncJob {
 
-    private static final String USERNAME = "sa";
-    private static final String PASSWORD = "password";
+    private static final String DB_SYNC_URL = "jdbc:h2:file:~/Development/h2Data/wms-manager";
+    private static final String USER = "sa";
+    private static final String PASS = "password";
 
-    private static final String EVENT_SYNC_URL = "http://localhost:8090/api/v1/event/all";
+    private final JdbcTemplate jdbcTemplate;
 
-    private final RestTemplate restTemplate = new RestTemplate();
-
-    private final EventController eventController;
-
-    public DataSyncJob(EventController eventController) {
-        this.eventController = eventController;
+    public DataSyncJob(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
-    // "0 0 * * * *" = the top of every hour of every day
-    // "*/10 * * * * *" = every ten seconds
-    @Scheduled(cron = "*/10 * * * * *")
+    // "0 0 * * * *" every hour
+    // "0 0/15 0 ? * *" every 15 minutes
+    // "*/30 * * * * *" every 30 seconds
+    @Scheduled(cron = "*/30 * * * * *")
     private void syncEvents() {
-        log.info("Date: " + Instant.now());
+        log.info("Date synchronization: " + Instant.now());
 
         try {
-            ResponseEntity<Collection<Event>> responseEntity = restTemplate
-                    .exchange(EVENT_SYNC_URL, HttpMethod.GET, null, new ParameterizedTypeReference<Collection<Event>>() {
-                    });
+            Connection external = DriverManager.getConnection(DB_SYNC_URL,USER,PASS);
+            Statement statement = external.createStatement();
+            String sql = "SCRIPT TO './backup.sql'";
+            statement.executeUpdate(sql);
+            statement.close();
+            external.close();
 
-            Collection<Event> events = responseEntity.getBody();
-            if (!CollectionUtils.isEmpty(events)) {
-                events.forEach(event -> {
-                    if (event.isAddedOrUpdated()) {
-                        eventController.getByExternalId(event.getExternalId()).ifPresent(existingEvent -> {
-                            eventController.update(existingEvent.getId(), event);
-                        });
+            jdbcTemplate.execute("RUNSCRIPT FROM 'backup.sql'");
 
-                    }
-                });
-            }
+
         } catch (Exception e) {
             log.error("Error occurred: ", e);
         }
     }
+
 }

@@ -1,10 +1,5 @@
 package com.lodz.p.edu.iap.lab.wmsemp.api.warehouse;
 
-import com.lodz.p.edu.iap.lab.wmsemp.api.event.EventController;
-import com.lodz.p.edu.iap.lab.wmsemp.entity.event.AddEvent;
-import com.lodz.p.edu.iap.lab.wmsemp.entity.event.DeleteEvent;
-import com.lodz.p.edu.iap.lab.wmsemp.entity.event.Event;
-import com.lodz.p.edu.iap.lab.wmsemp.entity.event.Type;
 import com.lodz.p.edu.iap.lab.wmsemp.entity.warehouse.Item;
 import com.lodz.p.edu.iap.lab.wmsemp.entity.warehouse.Warehouse;
 import org.springframework.web.bind.annotation.*;
@@ -14,15 +9,13 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1/warehouse")
-@CrossOrigin(origins = "http://localhost:4210")
+@CrossOrigin(origins = "http://localhost:4211")
 public class WarehouseController {
 
-    private final WarehouseRepository repository;
-    private final EventController eventController;
+    private WarehouseRepository repository;
 
-    public WarehouseController(WarehouseRepository repository, EventController eventController) {
+    public WarehouseController(WarehouseRepository repository) {
         this.repository = repository;
-        this.eventController = eventController;
     }
 
     @GetMapping("/all")
@@ -41,24 +34,20 @@ public class WarehouseController {
     }
 
     @PostMapping
-    public void save(@RequestBody AddEvent event) {
-        //ToDo
+    public void save(@RequestBody Warehouse warehouse) {
+        repository.save(warehouse);
     }
 
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable(value = "id") Long id) {
-        DeleteEvent event = new DeleteEvent();
-        //ToDo
+        repository.deleteById(id);
     }
 
     @PutMapping("/{id}")
-    public void addItem(@PathVariable(value = "id") Long id, @RequestBody AddEvent event) {
+    public void addItem(@PathVariable(value = "id") Long id, @RequestBody Item item) {
         Warehouse warehouse = repository.findById(id).orElseThrow(IllegalStateException::new);
-        //warehouse.getItems().add(item);
+        warehouse.getItems().add(item);
         repository.save(warehouse);
-        //ToDo
     }
-
-    //todo transfer method
 
 }
