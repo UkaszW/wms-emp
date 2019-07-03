@@ -1,5 +1,7 @@
 package com.lodz.p.edu.iap.lab.wmsemp.api.item;
 
+import com.lodz.p.edu.iap.lab.wmsemp.entity.event.AddEvent;
+import com.lodz.p.edu.iap.lab.wmsemp.entity.event.DeleteEvent;
 import com.lodz.p.edu.iap.lab.wmsemp.entity.warehouse.Item;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,13 +29,18 @@ public class ItemController {
         return repository.findById(id);
     }
 
+    @GetMapping("/{externalId}")
+    public Optional<Item> getByExternalId(@PathVariable(value = "externalId") String externalId) {
+        return repository.findAll().stream().filter(event -> externalId.equals(event.getExternalId())).findFirst();
+    }
+
     @PostMapping
-    public void save(@RequestBody Item item) {
-        repository.save(item);
+    public void save(@RequestBody AddEvent event) {
+        //ToDo
     }
 
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable(value = "id") Long id) {
-        repository.deleteById(id);
+        DeleteEvent event = new DeleteEvent();
     }
 }
